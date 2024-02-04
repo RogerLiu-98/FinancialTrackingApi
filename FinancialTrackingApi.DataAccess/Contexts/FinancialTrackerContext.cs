@@ -1,10 +1,11 @@
 ﻿using FinancialTrackingApi.DataAccess.Entities;
 using FinancialTrackingApi.DataAccess.Helpers.Interfaces;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinancialTrackingApi.DataAccess.Contexts
 {
-    public class FinancialTrackerContext : DbContext
+    public class FinancialTrackerContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
         private readonly int _userId;
         private readonly TimeProvider _timeProvider;
@@ -27,8 +28,6 @@ namespace FinancialTrackingApi.DataAccess.Contexts
             modelBuilder.Entity<ApplicationUser>(entity =>
             {
                 entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id).IsRequired().ValueGeneratedOnAdd();
 
                 entity.ToTable("Users", "dbo");
 

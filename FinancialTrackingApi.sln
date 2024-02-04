@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialTrackingApi", "Fin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialTrackingApi.DataAccess", "FinancialTrackingApi.DataAccess\FinancialTrackingApi.DataAccess.csproj", "{47F52F6A-E6FE-4CA3-8B13-D558B1740F65}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialTrackingApi.Service", "FinancialTrackingApi.Service\FinancialTrackingApi.Service.csproj", "{3B262E39-903B-46F1-9E78-E3C18D7A3721}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialTrackingApi.Model", "FinancialTrackingApi.Model\FinancialTrackingApi.Model.csproj", "{7CC097FA-4616-4AA6-B400-453A22B8DF55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{47F52F6A-E6FE-4CA3-8B13-D558B1740F65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47F52F6A-E6FE-4CA3-8B13-D558B1740F65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47F52F6A-E6FE-4CA3-8B13-D558B1740F65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B262E39-903B-46F1-9E78-E3C18D7A3721}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B262E39-903B-46F1-9E78-E3C18D7A3721}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B262E39-903B-46F1-9E78-E3C18D7A3721}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B262E39-903B-46F1-9E78-E3C18D7A3721}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CC097FA-4616-4AA6-B400-453A22B8DF55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CC097FA-4616-4AA6-B400-453A22B8DF55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CC097FA-4616-4AA6-B400-453A22B8DF55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CC097FA-4616-4AA6-B400-453A22B8DF55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
