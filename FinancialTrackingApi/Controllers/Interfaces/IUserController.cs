@@ -1,12 +1,13 @@
 ﻿using FinancialTrackingApi.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialTrackingApi.Controllers.Interfaces
 {
     public interface IUserController
     {
-        Task<IActionResult> Register(UserRegisterModel model);
+        Task<ActionResult<IdentityResult>> Register(UserRegisterModel model);
         Task<ActionResult<AccessToken>> Login(UserLoginModel model);
-        Task<IActionResult> ChangePassword(UserChangePasswordModel model);
+        Task<ActionResult<IdentityResult>> ChangePassword(UserChangePasswordModel model);
     }
 }

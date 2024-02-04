@@ -3,6 +3,7 @@ using FinancialTrackingApi.Controllers.Interfaces;
 using FinancialTrackingApi.Model;
 using FinancialTrackingApi.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -30,7 +31,7 @@ namespace FinancialTrackingApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ChangePassword(UserChangePasswordModel model)
+        public async Task<ActionResult<IdentityResult>> ChangePassword(UserChangePasswordModel model)
         {
             var userName = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(s => s.Type == "sub").Value;
             var user = await _userService.GetUserByUsernameAsync(userName);
@@ -39,11 +40,7 @@ namespace FinancialTrackingApi.Controllers
                 return NotFound("User not found");
             }
             var result = await _userService.ChangePasswordAsync(userName, model);
-            if (!result.Succeeded)
-            {
-                return Problem("Failed to change password");
-            }
-            return Ok();
+            return Ok(result);
         }
 
         [AllowAnonymous]
@@ -63,7 +60,7 @@ namespace FinancialTrackingApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Register([FromBody][SwaggerRequestBody] UserRegisterModel model)
+        public async Task<ActionResult<IdentityResult>> Register([FromBody][SwaggerRequestBody] UserRegisterModel model)
         {
             var user = await _userService.GetUserByUsernameAsync(model.UserName);
             if (user != null)
@@ -71,12 +68,7 @@ namespace FinancialTrackingApi.Controllers
                 return Conflict("User already exists");
             }
             var result = await _userService.RegisterUserAsync(model);
-            if (!result.Succeeded)
-            {
-                return Problem("Failed to register user");
-            }
-
-            return Ok();
+            return Ok(result);
         }
     }
 }
