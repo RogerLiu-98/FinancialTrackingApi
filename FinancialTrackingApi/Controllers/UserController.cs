@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 namespace FinancialTrackingApi.Controllers
 {
@@ -26,14 +27,19 @@ namespace FinancialTrackingApi.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost("user-change-password", Name = "ChangePassword")]
+        [HttpPost("change-password", Name = "ChangePassword")]
         [SwaggerOperation(Summary = "Change user password", OperationId = "ChangePassword")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IdentityResult>> ChangePassword(UserChangePasswordModel model)
         {
-            var userName = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(s => s.Type == "sub").Value;
+            var userName = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(s => s.Type == ClaimTypes.NameIdentifier).Value ?? string.Empty;
+            if (string.IsNullOrEmpty(userName))
+            {
+                return Unauthorized();
+            }
             var user = await _userService.GetUserByUsernameAsync(userName);
             if (user == null)
             {
@@ -44,7 +50,7 @@ namespace FinancialTrackingApi.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("user-login", Name = "Login")]
+        [HttpPost("login", Name = "Login")]
         [SwaggerOperation(Summary = "Login a user", OperationId = "Login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -55,7 +61,7 @@ namespace FinancialTrackingApi.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("user-register", Name = "Register")]
+        [HttpPost("register", Name = "Register")]
         [SwaggerOperation(Summary = "Register a new user", OperationId = "Register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
