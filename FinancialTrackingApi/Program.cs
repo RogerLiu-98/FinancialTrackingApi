@@ -15,6 +15,8 @@ builder.Services.ConfigureServices(configuration);
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(configuration);
 builder.Services.ConfigureSwagger();
+builder.Services.ConfigureAutoMapper();
+builder.Services.ConfigureCors();
 
 var app = builder.Build();
 
