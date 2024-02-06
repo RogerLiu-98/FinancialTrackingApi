@@ -7,8 +7,9 @@ namespace FinancialTrackingApi.Service.Interfaces
     public interface IUserService
     {
         Task<ApplicationUser?> GetUserByUsernameAsync(string username);
+        Task<bool> CheckUserPasswordAsync(ApplicationUser user, string password);
         Task<IdentityResult> RegisterUserAsync(UserRegisterModel model);
-        Task<AccessToken> LoginUserAsync(UserLoginModel model);
+        Task<SignInResult> LoginUserAsync(ApplicationUser user, UserLoginModel model);
         Task<IdentityResult> ChangePasswordAsync(string username, UserChangePasswordModel model);
     }
 }

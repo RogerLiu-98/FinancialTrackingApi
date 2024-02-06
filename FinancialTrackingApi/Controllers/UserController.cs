@@ -20,11 +20,13 @@ namespace FinancialTrackingApi.Controllers
     public class UserController : ControllerBase, IUserController
     {
         private readonly IUserService _userService;
+        private readonly ITokenService _tokenService;
         private readonly IHttpContextService _httpContextService;
 
-        public UserController(IUserService userService, IHttpContextService httpContextService)
+        public UserController(IUserService userService, ITokenService tokenService, IHttpContextService httpContextService)
         {
             _userService = userService;
+            _tokenService = tokenService;
             _httpContextService = httpContextService;
         }
 
@@ -44,6 +46,10 @@ namespace FinancialTrackingApi.Controllers
                 return NotFound("User not found");
             }
             var result = await _userService.ChangePasswordAsync(userName, model);
+            if (!result.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
             return Ok(result);
         }
 
@@ -54,8 +60,23 @@ namespace FinancialTrackingApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<AccessToken>> Login([FromBody][SwaggerRequestBody] UserLoginModel model)
         {
-            var result = await _userService.LoginUserAsync(model);
-            return Ok(result);
+            var user = await _userService.GetUserByUsernameAsync(model.UserName);
+            if (user == null)
+            {
+                return Unauthorized("User not found");
+            }
+            var passwordCorrect = await _userService.CheckUserPasswordAsync(user, model.Password);
+            if (!passwordCorrect)
+            {
+                return Unauthorized("Invalid password");
+            }
+            var result = await _userService.LoginUserAsync(user, model);
+            if (!result.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
+            var token = await _tokenService.GenerateAccessTokenAsync(user);
+            return Ok(token);
         }
 
         [AllowAnonymous]
@@ -72,6 +93,10 @@ namespace FinancialTrackingApi.Controllers
                 return Conflict("User already exists");
             }
             var result = await _userService.RegisterUserAsync(model);
+            if (!result.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
             return Ok(result);
         }
     }

@@ -24,7 +24,7 @@ namespace FinancialTrackingApi.Model.Validators
                 result.Add(new ValidationError
                 {
                     PropertyName = propertyName,
-                    ErrorMessage = "Category does not exist"
+                    ErrorMessage = $"Category {input.ToString()} does not exist"
                 });
             }
             return result;

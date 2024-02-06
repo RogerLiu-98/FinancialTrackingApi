@@ -30,25 +30,16 @@ namespace FinancialTrackingApi.Service
             return await _userManager.FindByNameAsync(username);
         }
 
-        private async Task<bool> CheckUserPasswordAsync(ApplicationUser user, string password)
+        public async Task<bool> CheckUserPasswordAsync(ApplicationUser user, string password)
         {
             _logger.LogInformation($"Checking user password for user {user.UserName}");
             return await _userManager.CheckPasswordAsync(user, password);
         }
 
-        public async Task<AccessToken> LoginUserAsync(UserLoginModel model)
+        public async Task<SignInResult> LoginUserAsync(ApplicationUser user, UserLoginModel model)
         {
             _logger.LogInformation($"Logging in user {model.UserName}");
-            var user = await GetUserByUsernameAsync(model.UserName);
-            if (user == null)
-            {
-                throw new UnauthorizedAccessException("Invalid username");
-            }
-            if (!await CheckUserPasswordAsync(user, model.Password))
-            {
-                throw new UnauthorizedAccessException("Invalid password");
-            }
-            return await _tokenService.GenerateAccessTokenAsync(user);
+            return await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
         }
 
         public async Task<IdentityResult> RegisterUserAsync(UserRegisterModel model)
