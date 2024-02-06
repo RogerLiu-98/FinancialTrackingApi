@@ -17,7 +17,7 @@ namespace FinancialTrackingApi.Common
         {
             try
             {
-                var userName = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(s => s.Type == ClaimTypes.NameIdentifier).Value;
+                var userName = _httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(s => s.Type == ClaimTypes.NameIdentifier)?.Value;
                 return userName;
             }
             catch (Exception ex)

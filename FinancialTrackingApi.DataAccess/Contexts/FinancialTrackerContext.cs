@@ -12,7 +12,15 @@ namespace FinancialTrackingApi.DataAccess.Contexts
 
         public FinancialTrackerContext(DbContextOptions<FinancialTrackerContext> options, IHttpContextService httpContextService, TimeProvider timeProvider) : base(options)
         {
-            _userName = httpContextService.GetUserName();
+            try
+            {
+                _userName = httpContextService.GetUserName();
+            }
+            catch (Exception ex)
+            {
+                _userName = "Unknown";
+            }
+
             _timeProvider = timeProvider;
             SavingChanges += UpdateAuditFields;
         }
