@@ -1,9 +1,12 @@
-﻿using FinancialTrackingApi.DataAccess.Contexts;
+﻿using FinancialTrackingApi.Common;
+using FinancialTrackingApi.Common.Interfaces;
+using FinancialTrackingApi.DataAccess.Contexts;
 using FinancialTrackingApi.DataAccess.Entities;
 using FinancialTrackingApi.DataAccess.Helpers;
-using FinancialTrackingApi.DataAccess.Helpers.Interfaces;
 using FinancialTrackingApi.DataAccess.Repositories;
 using FinancialTrackingApi.DataAccess.Repositories.Interfaces;
+using FinancialTrackingApi.Model.MappingProfiles;
+using FinancialTrackingApi.Model.Validators;
 using FinancialTrackingApi.Service;
 using FinancialTrackingApi.Service.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -29,14 +32,22 @@ namespace FinancialTrackingApi
             services.AddSingleton(configuration);
 
             // Helpers
-            services.AddScoped<IUserProvider, UserProvider>();
             services.AddSingleton<TimeProvider, ConcreteTimeProvider>();
 
             // Services
+            services.AddScoped<IHttpContextService, HttpContextService>();
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ITransactionService, TransactionService>();
             services.AddTransient<IValidationService, ValidationService>();
+
+            // Validators
+            services.AddTransient<TransactionAmountValidator>();
+            services.AddTransient<TransactionDateValidator>();
+            services.AddTransient<TransactionCategoryValidator>();
+            services.AddTransient<TransactionNameValidator>();
+            services.AddTransient<TransactionIdValidator>();
+
 
             // Repositories
             services.AddScoped<ITransactionRepository, TransactionRepository>();
@@ -107,17 +118,35 @@ namespace FinancialTrackingApi
                 options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
-                    Description = "JWT token must be provided",
+                    Description = "Enter JWT Token",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
                     Scheme = JwtBearerDefaults.AuthenticationScheme
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = JwtBearerDefaults.AuthenticationScheme
+                            },
+                            Scheme = "oauth2",
+                            Name = JwtBearerDefaults.AuthenticationScheme,
+                            In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                    }
                 });
             });
         }
 
         public static void ConfigureAutoMapper(this IServiceCollection services)
         {
-            services.AddAutoMapper(typeof(Program));
+            services.AddAutoMapper(typeof(TransactionMappingProfile));
         }
 
         public static void ConfigureCors(this IServiceCollection services)

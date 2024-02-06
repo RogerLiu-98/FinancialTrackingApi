@@ -18,5 +18,16 @@ namespace FinancialTrackingApi.DataAccess.Repositories
         {
             return await _context.Categories.Where(c => c.IsActive).ToListAsync();
         }
+
+        public async Task<Category> GetCategoryByName(string name)
+        {
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.IsActive &&
+                c.Name.ToUpper() == name.ToUpper());
+            if (category == null)
+            {
+                throw new KeyNotFoundException($"Category not found for Name: {name}");
+            }
+            return category;
+        }
     }
 }

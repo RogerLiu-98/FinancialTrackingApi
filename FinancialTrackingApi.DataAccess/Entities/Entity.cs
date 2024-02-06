@@ -9,12 +9,12 @@
 
         public bool IsDeleted { get; set; }
 
-        public DateTime CreatedTime { get; set; }
+        public DateTime? CreatedTime { get; set; }
 
-        public int CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
 
-        public DateTime UpdatedTime { get; set; }
+        public DateTime? UpdatedTime { get; set; }
 
-        public int UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
     }
 }

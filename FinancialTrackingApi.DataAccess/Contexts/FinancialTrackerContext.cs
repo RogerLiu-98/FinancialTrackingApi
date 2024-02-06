@@ -1,5 +1,5 @@
-﻿using FinancialTrackingApi.DataAccess.Entities;
-using FinancialTrackingApi.DataAccess.Helpers.Interfaces;
+﻿using FinancialTrackingApi.Common.Interfaces;
+using FinancialTrackingApi.DataAccess.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,12 +7,12 @@ namespace FinancialTrackingApi.DataAccess.Contexts
 {
     public class FinancialTrackerContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
-        private readonly int _userId;
+        private readonly string _userName;
         private readonly TimeProvider _timeProvider;
 
-        public FinancialTrackerContext(DbContextOptions<FinancialTrackerContext> options, IUserProvider userProvider, TimeProvider timeProvider) : base(options)
+        public FinancialTrackerContext(DbContextOptions<FinancialTrackerContext> options, IHttpContextService httpContextService, TimeProvider timeProvider) : base(options)
         {
-            _userId = userProvider.GetUserId();
+            _userName = httpContextService.GetUserName();
             _timeProvider = timeProvider;
             SavingChanges += UpdateAuditFields;
         }
@@ -87,21 +87,20 @@ namespace FinancialTrackingApi.DataAccess.Contexts
 
         private void UpdateAuditFields(object? sender, SaveChangesEventArgs? e)
         {
-            // TODO: Get user id through http context, please find it in ServiceExtensions.cs
             foreach (var entry in ChangeTracker.Entries().Where(
                 (e => (e.State == EntityState.Added || e.State == EntityState.Modified) && e.Entity is Entity && e != default)))
             {
                 // If we are adding a new entity, we need to populate CreatedBy and CreatedTime
                 if (entry.State == EntityState.Added)
                 {
-                    ((Entity)entry.Entity).CreatedBy = _userId;
+                    ((Entity)entry.Entity).CreatedBy = _userName;
                     ((Entity)entry.Entity).CreatedTime = _timeProvider.GetUtcNow().DateTime;
                 }
 
                 // If we are modifiying an existing entity, we need to populate UpdatedBy and UpdatedTime
                 if (entry.State == EntityState.Modified)
                 {
-                    ((Entity)entry.Entity).UpdatedBy = _userId;
+                    ((Entity)entry.Entity).UpdatedBy = _userName;
                     ((Entity)entry.Entity).UpdatedTime = _timeProvider.GetUtcNow().DateTime;
                 }
             }

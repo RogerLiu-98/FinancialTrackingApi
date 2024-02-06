@@ -8,6 +8,13 @@ namespace FinancialTrackingApi.Service
 {
     public class ValidationService : IValidationService
     {
+        private readonly IServiceProvider _serviceProvider;
+
+        public ValidationService(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
         public async Task<ValidationResultModel> ValidateModelAsync<T>(T model) where T : class
         {
             var validationResult = new ValidationResultModel();
@@ -20,7 +27,7 @@ namespace FinancialTrackingApi.Service
 
                 if (validationAttribute != null)
                 {
-                    var validator = (IValidator)Activator.CreateInstance(validationAttribute.ValidatorType);
+                    var validator = (IValidator)_serviceProvider.GetService(validationAttribute.ValidatorType);
                     var value = property.GetValue(model) as IConvertible;
                     var task = validator.ValidateAsync(property.Name, value);
                     validationTasks.Add(task);

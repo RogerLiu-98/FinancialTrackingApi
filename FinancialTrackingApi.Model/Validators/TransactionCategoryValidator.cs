@@ -19,7 +19,7 @@ namespace FinancialTrackingApi.Model.Validators
                 return result;
             }
             var categories = await _categoryRepository.GetAllCategories();
-            if (!categories.Any(categories => categories.Name == input.ToString()))
+            if (!categories.Any(c => c.Name.ToUpper() == input.ToString().ToUpper()))
             {
                 result.Add(new ValidationError
                 {

@@ -1,4 +1,6 @@
 ﻿using Asp.Versioning;
+using FinancialTrackingApi.Attributes;
+using FinancialTrackingApi.Common.Interfaces;
 using FinancialTrackingApi.Controllers.Interfaces;
 using FinancialTrackingApi.Model;
 using FinancialTrackingApi.Service.Interfaces;
@@ -6,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Security.Claims;
 
 namespace FinancialTrackingApi.Controllers
 {
@@ -19,27 +20,24 @@ namespace FinancialTrackingApi.Controllers
     public class UserController : ControllerBase, IUserController
     {
         private readonly IUserService _userService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextService _httpContextService;
 
-        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor)
+        public UserController(IUserService userService, IHttpContextService httpContextService)
         {
             _userService = userService;
-            _httpContextAccessor = httpContextAccessor;
+            _httpContextService = httpContextService;
         }
 
-        [HttpPost("change-password", Name = "ChangePassword")]
+        [HttpPatch("change-password", Name = "ChangePassword")]
         [SwaggerOperation(Summary = "Change user password", OperationId = "ChangePassword")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IdentityResult>> ChangePassword(UserChangePasswordModel model)
+        [ValidateUser]
+        public async Task<ActionResult<IdentityResult>> ChangePassword([FromBody][SwaggerRequestBody] UserChangePasswordModel model)
         {
-            var userName = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(s => s.Type == ClaimTypes.NameIdentifier).Value ?? string.Empty;
-            if (string.IsNullOrEmpty(userName))
-            {
-                return Unauthorized();
-            }
+            var userName = _httpContextService.GetUserName();
             var user = await _userService.GetUserByUsernameAsync(userName);
             if (user == null)
             {
@@ -54,7 +52,7 @@ namespace FinancialTrackingApi.Controllers
         [SwaggerOperation(Summary = "Login a user", OperationId = "Login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<AccessToken>> Login(UserLoginModel model)
+        public async Task<ActionResult<AccessToken>> Login([FromBody][SwaggerRequestBody] UserLoginModel model)
         {
             var result = await _userService.LoginUserAsync(model);
             return Ok(result);
@@ -63,7 +61,7 @@ namespace FinancialTrackingApi.Controllers
         [AllowAnonymous]
         [HttpPost("register", Name = "Register")]
         [SwaggerOperation(Summary = "Register a new user", OperationId = "Register")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IdentityResult>> Register([FromBody][SwaggerRequestBody] UserRegisterModel model)
